@@ -53,9 +53,11 @@ library(rvest)
 # YOUR_DATA <- read.csv("../data/XXXXX.csv") |> 
 #     clean_names()
 
-data <- read_excel("../data/Report_card_All_data_20250313.xlsx") |> 
+data <- read_excel("./data/Report_card_All_data_20250313.xlsx") |> 
     clean_names()
 
+getwd()
+ls(data)
 
 ```
 
