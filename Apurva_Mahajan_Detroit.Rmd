@@ -129,8 +129,6 @@ report_card_data %>%
 
 # 
 
-ls(data)
-
 
 # 
 report_card_data %>% 
@@ -168,16 +166,13 @@ Data details:
 
 #glimpse(YOUR_DATA)
 
-glimpse(data)
 
 ```
 
 # Data exploration: dates
 
 ```{r}
-data |> 
-   count(year) |> 
-  arrange(desc(n))
+
 ```
 
 # Questions
