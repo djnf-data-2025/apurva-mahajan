@@ -49,42 +49,38 @@ library(rvest)
 
 ```{r}
 
-# 
-# YOUR_DATA <- read.csv("../data/XXXXX.csv") |> 
-#     clean_names()
 
-data <- read.csv("./data/Report_card_All_data_20250313.csv") |> 
+# questions for monday, july 2.
+    # how should i best look at the coverage over time? if right now it's by quarter. is there a way to reliably aggregate this data?
+
+
+# load in vaccine report card data
+report_card_data <- read.csv("./data/Report_card_All_data_20250313.csv") |> 
     clean_names()
 
-
+# load in 
 
 
 # Checking out the basics of the database. 
-# I wanted to focus on measles to supplement the News' coverage of the recent outbreak, but this data set only has NA's for the MMR vaccine for years before 2024. 
-# Definitions:
-  # coverage refers to the percent of the population who have the immunization. 
+# coverage refers to the percent of the population who have the immunization. 
 
-data_mmr_clean <- data %>% 
-  mutate(
-    mmr_numeric = as.numeric(covgmmr)
-  )
 
 # MMR coverage 
-data %>% 
+report_card_data %>% 
   filter(year == 2024, quarter == "Q4") %>% 
   group_by(cntyname, year) %>%
   summarize(covgmmr) %>% 
   arrange(covgmmr)
 
 # Hepatitis A vaccination coverage for 2024
-data %>% 
+report_card_data %>% 
   filter(year == 2024, quarter == "Q4") %>% 
   group_by(cntyname, year) %>%
   summarize(covg_hep_a) %>% 
   arrange(covg_hep_a)
 
 # dTaP coverage
-data %>% 
+report_card_data %>% 
   filter(year == 2024, quarter == "Q4") %>% 
   group_by(cntyname, year) %>%
   summarize(covg_d_tap) %>% 
@@ -92,7 +88,7 @@ data %>%
 
 # pcv7 coverage
 
-data %>% 
+report_card_data %>% 
   filter(year == 2024, quarter == "Q4") %>% 
   group_by(cntyname, year) %>%
   summarize(covg_pcv7) %>% 
