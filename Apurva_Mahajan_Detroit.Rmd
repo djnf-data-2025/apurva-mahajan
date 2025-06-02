@@ -53,10 +53,53 @@ library(rvest)
 # YOUR_DATA <- read.csv("../data/XXXXX.csv") |> 
 #     clean_names()
 
-data <- read_excel("./data/Report_card_All_data_20250313.xlsx") |> 
+data <- read.csv("./data/Report_card_All_data_20250313.csv") |> 
     clean_names()
 
-getwd()
+
+
+
+# Checking out the basics of the database. 
+# I wanted to focus on measles to supplement the News' coverage of the recent outbreak, but this data set only has NA's for the MMR vaccine for years before 2024. 
+# Definitions:
+  # coverage refers to the percent of the population who have the immunization. 
+
+data_mmr_clean <- data %>% 
+  mutate(
+    mmr_numeric = as.numeric(covgmmr)
+  )
+
+# MMR coverage 
+data %>% 
+  filter(year == 2024, quarter == "Q4") %>% 
+  group_by(cntyname, year) %>%
+  summarize(covgmmr) %>% 
+  arrange(covgmmr)
+
+# Hepatitis A vaccination coverage for 2024
+data %>% 
+  filter(year == 2024, quarter == "Q4") %>% 
+  group_by(cntyname, year) %>%
+  summarize(covg_hep_a) %>% 
+  arrange(covg_hep_a)
+
+# dTaP coverage
+data %>% 
+  filter(year == 2024, quarter == "Q4") %>% 
+  group_by(cntyname, year) %>%
+  summarize(covg_d_tap) %>% 
+  arrange(covg_d_tap)
+
+# pcv7 coverage
+
+data %>% 
+  filter(year == 2024, quarter == "Q4") %>% 
+  group_by(cntyname, year) %>%
+  summarize(covg_pcv7) %>% 
+  arrange(covg_pcv7)
+
+# 
+
 ls(data)
 
 ```
@@ -89,7 +132,8 @@ data |>
 
 Write down questions you want answered:
 
-
+# Potential sources:
+# Thrishika Bala, epidemiologist for the state of Michigan
 
 # Data Details
 Source:
