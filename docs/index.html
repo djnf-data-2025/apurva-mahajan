@@ -357,57 +357,45 @@ display: none;
 
 <div id="story-pitch" class="section level2">
 <h2>Story pitch:</h2>
+<p><strong>rsw comment: let’s revise to first describe the story pitch.
+then describe the problems. the two are conflated here and it’s hard to
+follow the significance of what you are pursuing.</strong></p>
 <p>After my initial analysis, I’ve found that two counties in Michigan —
 Oscoda and Keweenaw — have seen the highest drops in immunization rates
 for three of the four major vaccine series, and consistently fell in the
 bottom three for lowest MMR vaccination rates in the state. These two
-counties also have some of the lowest populations in the state. I’ve
-joined the vaccination report card data to Census ACS data from 2023 on
-population for each county, and am working on joining election data to
-this to see if there’s a pattern between vaccination rates and how
-people voted in the 2024 and 2016 elections.</p>
-<p>Some current limitations are that I’m not sure general population is
-the best metric to use. I think using the population estimates for
-children under 18 would provide me more accurate numbers, since the
-value for immunization coverage itself is based on the proportion of
-children under a certain age range. But I would like to make my
-methodology as sound as possible, since certain series could only be
-recommended for certain age ranges, so I’m planning to come back and do
-some more research on this. However, there’s not much online publicly,
-so I’m a little stuck until I talk to an expert, such as a Michigan
-epidemiologist, who can provide me more context on this data, since
-these vaccine series are only used by the state’s department of health
-and human services.</p>
+counties also have some of the lowest populations in the state, which
+could potentially indicate that more rural areas are seeing larger drops
+in their vaccination rates for children.</p>
+<p>I’ve joined the vaccination report card data to Census ACS data from
+2023 on population for each county, and am working on joining election
+data to this to see if there’s a pattern between vaccination rates and
+how people voted in the 2024 and 2016 elections. I’d like to see the
+proportion of votes allocated toward the Republican Party and the
+Democratic Party for each of the counties in Michigan, and I want to
+perform a more robust analysis for these counties beyond what I found of
+the two counties that immediately stand out. I also plan on looking at
+the vaccination rates for the MMR vaccine alone. I’ve found the csv for
+this from the Michigan government and will load it in as I continue work
+on this story. The measles vaccine, which is included in each of the
+four vaccine series I’m analyzing, is primarily administered to young
+children and adolescents. There have been 9 reported measles cases this
+year in Michigan so far, in Ingham, Kent, Macomb, Marquette, Montcalm
+and Oakland Counties, making this the worst year in decades for measles
+in Michigan.</p>
 </div>
-<div id="section" class="section level1">
-<h1></h1>
+<div id="limitations" class="section level2">
+<h2>Limitations:</h2>
+<p>I would like to make my methodology as sound as possible, since
+certain series could only be recommended for certain age ranges, so I’m
+planning to do some more research on this. However, there’s not much
+online publicly, so I’m a little stuck until I talk to an expert, such
+as a Michigan epidemiologist, who can provide me more context on this
+data, since these vaccine series are only used by the state’s department
+of health and human services.</p>
 <hr />
-<p>A demo notebook for Dow Jones News Fund data interns</p>
-<p>During the week’s training, you will work on a project called
-Investigate Your Community to produce detailed story pitches relevant to
-their summer internship positions. The goal is to have the students
-research a topic relevant to your newsroom so they can get to work
-immediately at the internship.</p>
-<p>Here are some examples from last year’s DJNF data journalism
-training:</p>
-<p>Hannah Rosenberger, at ASI Media/Counselor magazine, produced this
-analysis on name, image and likeness trends: <a href="https://hrosenberger.github.io/ASI-NIL-Project/" class="uri">https://hrosenberger.github.io/ASI-NIL-Project/</a></p>
-<p>Shifra Dayak, an intern at the Connecticut Mirror, produced this
-analysis of environment spill data: <a href="https://shifradayak.github.io/DJNF_Merrill/ct_env_spills.html" class="uri">https://shifradayak.github.io/DJNF_Merrill/ct_env_spills.html</a>.</p>
-<p>Michael Zhang, an intern at the Houston Landing, explored local
-election data: <a href="https://michaelzhangreporter.github.io/Houston_Campaign_Finance/" class="uri">https://michaelzhangreporter.github.io/Houston_Campaign_Finance/</a></p>
-<p>Here’s what your newsroom suggested for a project:</p>
-<p>Wondering if you could explore trends of our vaccination rates,
-especially considering we’re dealing with measles
-here.https://www.detroitnews.com/story/news/local/michigan/2025/04/24/michigan-headed-toward-worst-year-for-measles-in-decades-chief-medical-exec-says/83214966007/</p>
-<p>This website explains the different Series numbers for the sets of
-vaccines: <a href="https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards" class="uri">https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards</a></p>
-<p>If you or our intern have any questions, you can contact Lynn Sutfin
-at the Michigan Department of Health and Human Services at <a href="mailto:SutfinL1@michigan.gov" class="email">SutfinL1@michigan.gov</a>.</p>
-<p>Background info: There have been 9 reported measles cases this year
-in Michigan, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland
-Counties.</p>
-<p>This notebook helps you get started</p>
+<p><strong>rsw comment: integrate the underlined material below into
+your narrative and code</strong></p>
 </div>
 <div id="load-software-libraries" class="section level1">
 <h1>Load software libraries</h1>
@@ -481,6 +469,9 @@ report_card_data$cntyname %&gt;%
 <pre class="r"><code># Michigan has 83 counties. There are 85 unique county values, because this data set includes Detroit City and the State of Michigan&#39;s vaccination report cards.
 
 # I&#39;m creating a column based on an index so I can plot this and analyze by time. 
+
+#rsw comment: do you really need to have 76 columns at this point? can you narrow it down?
+
 report_card_data &lt;- report_card_data %&gt;% 
   mutate(
      quarter_num = as.numeric(sub(&quot;Q&quot;, &quot;&quot;, quarter)),
@@ -491,15 +482,34 @@ report_card_data &lt;- report_card_data %&gt;%
 <div id="percent-change-analysis-for-four-childhood-vaccination-series-over-the-past-decade" class="section level1">
 <h1>Percent change analysis for four childhood vaccination series over
 the past decade</h1>
+<p>#rsw comment: break out each one of these, provide an english
+translation for each of the vaccine series 4313314 = “a polio vaccine”
+and display them using a datatable</p>
+<p>datatable(DF, caption = “XXXX”, options = list(pageLength = 20))</p>
 <pre class="r"><code>### PERCENT CHANGE IN VACCINATION COVERAGE
+
+##rsw comment: define 4313314, 43133142, 132321, 1323213. editors will have no idea what you&#39;re talking about
 
 # For this analysis, I&#39;m focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
 
 
-#### 4313314 SERIES ####
-# Let&#39;s look at the 4313314 series: &quot;4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV.&quot; 
+#### 4313314 SERIES ####</code></pre>
+<div id="series" class="section level2">
+<h2>4313314 series:</h2>
+<ul>
+<li>4 or more doses of DTaP/DTP/DT</li>
+<li>3 or more doses of Polio</li>
+<li>1 or more dose of MMR</li>
+<li>3 or more doses of Hib</li>
+<li>3 or more doses of HepB</li>
+<li>1 or more dose of Varicella</li>
+<li>4 or more doses of PCV.</li>
+</ul>
+<pre class="r"><code># Let&#39;s look at the 4313314 series: &quot;4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV.&quot; 
 
-# Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series.
+# Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series. 
+
+#rsw comment - so how many people are not vaccinated for polio now by county?
 
 report_card_data %&gt;% 
   group_by(cntyname) %&gt;% 
@@ -527,8 +537,20 @@ report_card_data %&gt;%
 ##  9 Lake            75.3      57.1                -24.2
 ## 10 St. Joseph      81.5      61.9                -24.0
 ## # ℹ 75 more rows</code></pre>
-<pre class="r"><code>#### 43133142 SERIES ####
-## Again, Oscoda and Keweenaw are in the top two counties that have nearly halved their vaccine coverage for this series.
+</div>
+<div id="series-1" class="section level2">
+<h2>43133142 series:</h2>
+<ul>
+<li>4 or more doses of DTaP/DTP/DT</li>
+<li>3 or more doses of Polio</li>
+<li>1 or more dose of MMR</li>
+<li>3 or more doses of Hib</li>
+<li>3 or more doses of Hep B</li>
+<li>1 or more dose of Varicella</li>
+<li>4 or more doses of PCV</li>
+<li>2 or more doses of HepA</li>
+</ul>
+<pre class="r"><code>## Again, Oscoda and Keweenaw are in the top two counties that have nearly halved their vaccine coverage for this series.
 report_card_data %&gt;% 
   group_by(cntyname) %&gt;% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %&gt;% 
@@ -555,6 +577,17 @@ report_card_data %&gt;%
 ##  9 Baraga        55.4      50.4                -9.03
 ## 10 Huron         54.6      50.6                -7.33
 ## # ℹ 75 more rows</code></pre>
+</div>
+<div id="series-2" class="section level2">
+<h2>132321 series:</h2>
+<ul>
+<li>1 or more doses of Tdap</li>
+<li>3 or more doses of Polio</li>
+<li>2 or more doses of MMR</li>
+<li>3 or more doses of HepB</li>
+<li>2 or more doses of Varicella</li>
+<li>1 or more dose of MenACWY</li>
+</ul>
 <pre class="r"><code>#### 132321 SERIES ####
 ##This series did not have as high percent change decreases, but Keewenaw is in the top five here too. 
 report_card_data %&gt;% 
@@ -583,6 +616,18 @@ report_card_data %&gt;%
 ##  9 Muskegon         81.6      77.9                -4.53
 ## 10 Monroe           66.5      63.8                -4.06
 ## # ℹ 75 more rows</code></pre>
+</div>
+<div id="series-3" class="section level2">
+<h2>1323213 series:</h2>
+<ul>
+<li>1 or more doses of Tdap</li>
+<li>3 or more doses of Polio</li>
+<li>2 or more doses of MMR</li>
+<li>3 or more doses of HepB</li>
+<li>2 or more doses of Varicella</li>
+<li>1 or more dose of MenACWY</li>
+<li>HPV complete (with 2 or 3 doses (Males &amp; Females))</li>
+</ul>
 <pre class="r"><code>#### 1323213 SERIES ####
 # Nearly all counties have increased their coverage of this series. I&#39;m wondering the reason behind this, and if it is significant. Could this change be because this is a new vaccine series that only started being implemented recently? Would love to talk to a Michigan epidemiologist who works for the state DHHS or some other expert to understand this. 
 report_card_data %&gt;% 
@@ -612,8 +657,11 @@ report_card_data %&gt;%
 ## 10 Keweenaw         18.3      24                   31.1
 ## # ℹ 75 more rows</code></pre>
 </div>
+</div>
 <div id="population-analysis" class="section level1">
 <h1>Population analysis</h1>
+<p>#rsw comment: again, these labels need to be in English! covg4313314
+etc</p>
 <pre class="r"><code># Let&#39;s look at populations for these counties.
 
 ###### DELETE API KEY BEFORE PUSHING!!!!! ######
@@ -662,8 +710,6 @@ report_card_with_pop %&gt;%
 
 # I&#39;m going to re-try the population join, but instead only selecting the population under # Census data on population, election results data dating back to 2016. 
 
-# Checking out the basics of the database. 
-# coverage refers to the percent of the population who have the immunization. 
 
 
 
@@ -751,9 +797,12 @@ report_card_data %&gt;%
 <div id="potential-sources" class="section level1">
 <h1>Potential sources:</h1>
 <p>Thrishika Bala, epidemiologist for the state of Michigan</p>
+<p>SutfinL1@michigan.gov</p>
 </div>
 <div id="data-details" class="section level1">
 <h1>Data Details</h1>
+<p><u>This website explains the different Series numbers for the sets of
+vaccines: <a href="https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards" class="uri">https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards</a></u></p>
 <p>Source: <a href="https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards" class="uri">https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards</a></p>
 <p>Documentation: <a href="https://www.michigan.gov/mdhhs/-/media/Project/Websites/mdhhs/Adult-and-Childrens-Services/Children-and-Families/Immunization-Information/LHD/Immunization-Report-Cards/Report_Card_Defs__FAQs_2021.pdf?rev=93e4ac10b66c4c10abcd3c02a6b55982&amp;hash=EA6122E84CB516E9E6D335CC73BDB5CF" class="uri">https://www.michigan.gov/mdhhs/-/media/Project/Websites/mdhhs/Adult-and-Childrens-Services/Children-and-Families/Immunization-Information/LHD/Immunization-Report-Cards/Report_Card_Defs__FAQs_2021.pdf?rev=93e4ac10b66c4c10abcd3c02a6b55982&amp;hash=EA6122E84CB516E9E6D335CC73BDB5CF</a></p>
 </div>

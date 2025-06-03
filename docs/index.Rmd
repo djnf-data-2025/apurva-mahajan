@@ -8,39 +8,19 @@ date: "2025-04-22"
 
 **rsw comment: let's revise to first describe the story pitch. then describe the problems. the two are conflated here and it's hard to follow the significance of what you are pursuing.**
 
-After my initial analysis, I've found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state. **RSW COMMENT: tell us why this is significant** I've joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story.
+After my initial analysis, I've found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state, which could potentially indicate that more rural areas are seeing larger drops in their vaccination rates for children. 
 
-Some current limitations are that I'm [not sure general population is the best metric to use.]{.underline}**rsw comment: im not following you here. we look at the voting patterns for broader context** I think using the population estimates for children under 18 would provide me more accurate numbers, since the value for immunization coverage itself is based on the proportion of children under a certain age range. But I would like to make my methodology as sound as possible, since certain series could only be recommended for certain age ranges, so I'm planning to come back and do some more research on this. However, there's not much online publicly, so I'm a little stuck until I talk to an expert, such as a Michigan epidemiologist, who can provide me more context on this data, since these vaccine series are only used by the state's department of health and human services.
+I've joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story. The measles vaccine, which is included in each of the four vaccine series I'm analyzing, is primarily administered to young children and adolescents. There have been 9 reported measles cases this year in Michigan so far, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties, making this the worst year in decades for measles in Michigan.
+
+## Limitations:
+
+I would like to make my methodology as sound as possible, since certain series could only be recommended for certain age ranges, so I'm planning to do some more research on this. However, there's not much online publicly, so I'm a little stuck until I talk to an expert, such as a Michigan epidemiologist, who can provide me more context on this data, since these vaccine series are only used by the state's department of health and human services.
 
 ------------------------------------------------------------------------
 
-**rsw comment: cut these notes below and focus on your project**
-
-~~A demo notebook for Dow Jones News Fund data interns~~
-
-~~During the week's training, you will work on a project called Investigate Your Community to produce detailed story pitches relevant to their summer internship positions. The goal is to have the students research a topic relevant to your newsroom so they can get to work immediately at the internship.~~
-
-~~Here are some examples from last year's DJNF data journalism training:~~
-
-~~Hannah Rosenberger, at ASI Media/Counselor magazine, produced this analysis on name, image and likeness trends: <https://hrosenberger.github.io/ASI-NIL-Project/>~~
-
-~~Shifra Dayak, an intern at the Connecticut Mirror, produced this analysis of environment spill data: <https://shifradayak.github.io/DJNF_Merrill/ct_env_spills.html>.~~
-
-~~Michael Zhang, an intern at the Houston Landing, explored local election data: <https://michaelzhangreporter.github.io/Houston_Campaign_Finance/>~~
-
-~~Here's what your newsroom suggested for a project:~~
 
 **rsw comment: integrate the underlined material below into your narrative and code**
 
-[Wondering if you could explore trends of our vaccination rates, especially considering we're dealing with measles here.https://www.detroitnews.com/story/news/local/michigan/2025/04/24/michigan-headed-toward-worst-year-for-measles-in-decades-chief-medical-exec-says/83214966007/]{.underline}
-
-[This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>]{.underline}
-
-[If you or our intern have any questions, you can contact Lynn Sutfin at the Michigan Department of Health and Human Services at [SutfinL1\@michigan.gov](mailto:SutfinL1@michigan.gov){.email}.]{.underline}
-
-[Background info: There have been 9 reported measles cases this year in Michigan, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties.]{.underline}
-
-[This notebook helps you get started]{.underline}
 
 # Load software libraries
 
@@ -103,6 +83,19 @@ datatable(DF, caption = "XXXX", options = list(pageLength = 20))
 
 
 #### 4313314 SERIES ####
+``` 
+
+## 4313314 series: 
+
+- 4 or more doses of DTaP/DTP/DT
+- 3 or more doses of Polio
+- 1 or more dose of MMR
+- 3 or more doses of Hib
+- 3 or more doses of HepB
+- 1 or more dose of Varicella
+- 4 or more doses of PCV. 
+
+```{r}
 # Let's look at the 4313314 series: "4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV." 
 
 # Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series. 
@@ -121,8 +114,22 @@ report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
+
+```
+
+## 43133142 series:
+
+- 4 or more doses of DTaP/DTP/DT
+- 3 or more doses of Polio
+- 1 or more dose of MMR
+- 3 or more doses of Hib
+- 3 or more doses of Hep B
+- 1 or more dose of Varicella
+- 4 or more doses of PCV
+- 2 or more doses of HepA
+
+```{r}
  
-#### 43133142 SERIES ####
 ## Again, Oscoda and Keweenaw are in the top two counties that have nearly halved their vaccine coverage for this series.
 report_card_data %>% 
   group_by(cntyname) %>% 
@@ -136,6 +143,18 @@ report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
+```
+
+## 132321 series:
+
+- 1 or more doses of Tdap
+- 3 or more doses of Polio
+- 2 or more doses of MMR 
+- 3 or more doses of HepB 
+- 2 or more doses of Varicella 
+- 1 or more dose of MenACWY
+
+```{r}
 
 #### 132321 SERIES ####
 ##This series did not have as high percent change decreases, but Keewenaw is in the top five here too. 
@@ -151,6 +170,21 @@ report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
+
+```
+
+## 1323213 series:
+
+- 1 or more doses of Tdap
+- 3 or more doses of Polio
+- 2 or more doses of MMR
+- 3 or more doses of HepB
+- 2 or more doses of Varicella
+- 1 or more dose of MenACWY
+- HPV complete (with 2 or 3 doses (Males & Females))
+
+
+``` {r}
 #### 1323213 SERIES ####
 # Nearly all counties have increased their coverage of this series. I'm wondering the reason behind this, and if it is significant. Could this change be because this is a new vaccine series that only started being implemented recently? Would love to talk to a Michigan epidemiologist who works for the state DHHS or some other expert to understand this. 
 report_card_data %>% 
@@ -164,6 +198,8 @@ report_card_data %>%
   ) %>% 
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
+
+
 
 ```
 
@@ -205,8 +241,6 @@ report_card_with_pop %>%
 
 # I'm going to re-try the population join, but instead only selecting the population under # Census data on population, election results data dating back to 2016. 
 
-# Checking out the basics of the database. 
-# coverage refers to the percent of the population who have the immunization. 
 
 
 
@@ -270,7 +304,10 @@ Write down questions you want answered:
 
 Thrishika Bala, epidemiologist for the state of Michigan
 
+SutfinL1\@michigan.gov
+
 # Data Details
+[This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>]{.underline}
 
 Source: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>
 
