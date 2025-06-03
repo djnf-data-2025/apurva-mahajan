@@ -6,36 +6,41 @@ date: "2025-04-22"
 
 ## Story pitch:
 
-After my initial analysis, I've found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state. I've joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story.
+**rsw comment: let's revise to first describe the story pitch. then describe the problems. the two are conflated here and it's hard to follow the significance of what you are pursuing.**
 
-Some current limitations are that I'm not sure general population is the best metric to use. I think using the population estimates for children under 18 would provide me more accurate numbers, since the value for immunization coverage itself is based on the proportion of children under a certain age range. But I would like to make my methodology as sound as possible, since certain series could only be recommended for certain age ranges, so I'm planning to come back and do some more research on this. However, there's not much online publicly, so I'm a little stuck until I talk to an expert, such as a Michigan epidemiologist, who can provide me more context on this data, since these vaccine series are only used by the state's department of health and human services.
+After my initial analysis, I've found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state. **RSW COMMENT: tell us why this is significant** I've joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story.
 
+Some current limitations are that I'm [not sure general population is the best metric to use.]{.underline}**rsw comment: im not following you here. we look at the voting patterns for broader context** I think using the population estimates for children under 18 would provide me more accurate numbers, since the value for immunization coverage itself is based on the proportion of children under a certain age range. But I would like to make my methodology as sound as possible, since certain series could only be recommended for certain age ranges, so I'm planning to come back and do some more research on this. However, there's not much online publicly, so I'm a little stuck until I talk to an expert, such as a Michigan epidemiologist, who can provide me more context on this data, since these vaccine series are only used by the state's department of health and human services.
 
 ------------------------------------------------------------------------
 
-A demo notebook for Dow Jones News Fund data interns
+**rsw comment: cut these notes below and focus on your project**
 
-During the week's training, you will work on a project called Investigate Your Community to produce detailed story pitches relevant to their summer internship positions. The goal is to have the students research a topic relevant to your newsroom so they can get to work immediately at the internship.
+~~A demo notebook for Dow Jones News Fund data interns~~
 
-Here are some examples from last year's DJNF data journalism training:
+~~During the week's training, you will work on a project called Investigate Your Community to produce detailed story pitches relevant to their summer internship positions. The goal is to have the students research a topic relevant to your newsroom so they can get to work immediately at the internship.~~
 
-Hannah Rosenberger, at ASI Media/Counselor magazine, produced this analysis on name, image and likeness trends: <https://hrosenberger.github.io/ASI-NIL-Project/>
+~~Here are some examples from last year's DJNF data journalism training:~~
 
-Shifra Dayak, an intern at the Connecticut Mirror, produced this analysis of environment spill data: <https://shifradayak.github.io/DJNF_Merrill/ct_env_spills.html>.
+~~Hannah Rosenberger, at ASI Media/Counselor magazine, produced this analysis on name, image and likeness trends: <https://hrosenberger.github.io/ASI-NIL-Project/>~~
 
-Michael Zhang, an intern at the Houston Landing, explored local election data: <https://michaelzhangreporter.github.io/Houston_Campaign_Finance/>
+~~Shifra Dayak, an intern at the Connecticut Mirror, produced this analysis of environment spill data: <https://shifradayak.github.io/DJNF_Merrill/ct_env_spills.html>.~~
 
-Here's what your newsroom suggested for a project:
+~~Michael Zhang, an intern at the Houston Landing, explored local election data: <https://michaelzhangreporter.github.io/Houston_Campaign_Finance/>~~
 
-Wondering if you could explore trends of our vaccination rates, especially considering we're dealing with measles here.https://www.detroitnews.com/story/news/local/michigan/2025/04/24/michigan-headed-toward-worst-year-for-measles-in-decades-chief-medical-exec-says/83214966007/
+~~Here's what your newsroom suggested for a project:~~
 
-This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>
+**rsw comment: integrate the underlined material below into your narrative and code**
 
-If you or our intern have any questions, you can contact Lynn Sutfin at the Michigan Department of Health and Human Services at [SutfinL1\@michigan.gov](mailto:SutfinL1@michigan.gov){.email}.
+[Wondering if you could explore trends of our vaccination rates, especially considering we're dealing with measles here.https://www.detroitnews.com/story/news/local/michigan/2025/04/24/michigan-headed-toward-worst-year-for-measles-in-decades-chief-medical-exec-says/83214966007/]{.underline}
 
-Background info: There have been 9 reported measles cases this year in Michigan, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties.
+[This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>]{.underline}
 
-This notebook helps you get started
+[If you or our intern have any questions, you can contact Lynn Sutfin at the Michigan Department of Health and Human Services at [SutfinL1\@michigan.gov](mailto:SutfinL1@michigan.gov){.email}.]{.underline}
+
+[Background info: There have been 9 reported measles cases this year in Michigan, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties.]{.underline}
+
+[This notebook helps you get started]{.underline}
 
 # Load software libraries
 
@@ -71,6 +76,9 @@ report_card_data$cntyname %>%
 # Michigan has 83 counties. There are 85 unique county values, because this data set includes Detroit City and the State of Michigan's vaccination report cards.
 
 # I'm creating a column based on an index so I can plot this and analyze by time. 
+
+#rsw comment: do you really need to have 76 columns at this point? can you narrow it down?
+
 report_card_data <- report_card_data %>% 
   mutate(
      quarter_num = as.numeric(sub("Q", "", quarter)),
@@ -82,8 +90,14 @@ report_card_data <- report_card_data %>%
 
 # Percent change analysis for four childhood vaccination series over the past decade
 
-``` {r}
+#rsw comment: break out each one of these, provide an english translation for each of the vaccine series 4313314 = "a polio vaccine" and display them using a datatable
+
+datatable(DF, caption = "XXXX", options = list(pageLength = 20))
+
+```{r}
 ### PERCENT CHANGE IN VACCINATION COVERAGE
+
+##rsw comment: define 4313314, 43133142, 132321, 1323213. editors will have no idea what you're talking about
 
 # For this analysis, I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
 
@@ -91,7 +105,9 @@ report_card_data <- report_card_data %>%
 #### 4313314 SERIES ####
 # Let's look at the 4313314 series: "4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV." 
 
-# Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series.
+# Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series. 
+
+#rsw comment - so how many people are not vaccinated for polio now by county?
 
 report_card_data %>% 
   group_by(cntyname) %>% 
@@ -152,6 +168,8 @@ report_card_data %>%
 ```
 
 # Population analysis
+
+#rsw comment: again, these labels need to be in English! covg4313314 etc
 
 ```{r}
 
@@ -243,7 +261,6 @@ report_card_data %>%
 
 
 ```
-
 
 # Questions
 
