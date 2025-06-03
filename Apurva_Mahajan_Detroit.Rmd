@@ -50,8 +50,7 @@ library(zoo)
 # The report card data provides estimates for immunization coverage at the county level for vaccines recommended for children (19-35 months) and adolescent (13-17-year-olds)
 
 # load in vaccine report card data
-report_card_data <- read.csv("./data/Report_card_All_data_20250313.csv") |> 
-    clean_names()
+report_card_data <- read.csv("./data/Report_card_All_data_20250313.csv") %>% clean_names()
 
 # Since the time for this data is by quarter, I'm going to create a column based on an index so I can plot this and analyze by time. 
 
@@ -75,7 +74,9 @@ report_card_data %>%
   ) %>% 
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% arrange(pct_change_2014_2024)
 
-# now lets look at the 4313314 vaccine, which is: 
+
+### CHANGES IN VACCINE COVERAGE 
+#now lets look at the 4313314 vaccine, which is: 
   # "4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV" 
 
 report_card_data %>% 
@@ -93,9 +94,6 @@ report_card_data %>%
 # Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. 
   
 
-
-# Checking out the basics of the database. 
-# coverage refers to the percent of the population who have the immunization. 
 
 
 # MMR coverage 
