@@ -4,6 +4,7 @@ output: html_document
 date: "2025-04-22"
 ---
 
+
 ## Story pitch:
 
 **rsw comment: let's revise to first describe the story pitch. then describe the problems. the two are conflated here and it's hard to follow the significance of what you are pursuing.**
@@ -30,12 +31,14 @@ I would like to make my methodology as sound as possible, since certain series c
 #install.packages("readxl")
 #install.packages("rvest")
 #install.packages("tidycensus")
+#install.packages("DT")
 
 library(tidyverse)
 library(janitor)
 library(readxl)
 library(rvest)
 library(tidycensus)
+library(DT)
 
 
 ```
@@ -81,8 +84,6 @@ datatable(DF, caption = "XXXX", options = list(pageLength = 20))
 
 # For this analysis, I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
 
-
-#### 4313314 SERIES ####
 ``` 
 
 ## 4313314 series: 
@@ -102,7 +103,7 @@ datatable(DF, caption = "XXXX", options = list(pageLength = 20))
 
 #rsw comment - so how many people are not vaccinated for polio now by county?
 
-report_card_data %>% 
+series_1 <- report_card_data %>% 
   group_by(cntyname) %>% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %>% 
   select(cntyname, quarter_index, covg4313314) %>% 
@@ -113,6 +114,8 @@ report_card_data %>%
   ) %>% 
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
+
+datatable(series_1, options = list(pageLength = 20))
 
 
 ```
@@ -131,7 +134,7 @@ report_card_data %>%
 ```{r}
  
 ## Again, Oscoda and Keweenaw are in the top two counties that have nearly halved their vaccine coverage for this series.
-report_card_data %>% 
+series_2 <- report_card_data %>% 
   group_by(cntyname) %>% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %>% 
   select(cntyname, quarter_index, covg43133142) %>% 
@@ -142,6 +145,9 @@ report_card_data %>%
   ) %>% 
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
+
+datatable(series_2, options = list(pageLength = 20))
+
 
 ```
 
@@ -158,7 +164,7 @@ report_card_data %>%
 
 #### 132321 SERIES ####
 ##This series did not have as high percent change decreases, but Keewenaw is in the top five here too. 
-report_card_data %>% 
+series_3 <- report_card_data %>% 
   group_by(cntyname) %>% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %>% 
   select(cntyname, quarter_index, covg132321) %>% 
@@ -169,6 +175,8 @@ report_card_data %>%
   ) %>% 
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
+
+datatable(series_3, options = list(pageLength = 20))
 
 
 ```
@@ -187,7 +195,7 @@ report_card_data %>%
 ``` {r}
 #### 1323213 SERIES ####
 # Nearly all counties have increased their coverage of this series. I'm wondering the reason behind this, and if it is significant. Could this change be because this is a new vaccine series that only started being implemented recently? Would love to talk to a Michigan epidemiologist who works for the state DHHS or some other expert to understand this. 
-report_card_data %>% 
+series_4 <- report_card_data %>% 
   group_by(cntyname) %>% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %>% 
   select(cntyname, quarter_index, covg1323213) %>% 
@@ -199,6 +207,7 @@ report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
+datatable(series_4, options = list(pageLength = 20))
 
 
 ```
@@ -240,9 +249,6 @@ report_card_with_pop %>%
 # A reason there might be less people getting these vaccine series could potentially be because there are less children in the county? Since this is the least populated county, if children continue to grow up, there may no longer be a need to get these vaccine series. 
 
 # I'm going to re-try the population join, but instead only selecting the population under # Census data on population, election results data dating back to 2016. 
-
-
-
 
 report_card_data %>% 
   filter(cntyname == "Keweenaw") %>% 
@@ -303,8 +309,7 @@ Write down questions you want answered:
 # Potential sources:
 
 Thrishika Bala, epidemiologist for the state of Michigan
-
-SutfinL1\@michigan.gov
+Lynn Sutfin, PIO for Michigan DHHS, SutfinL1\@michigan.gov
 
 # Data Details
 [This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>]{.underline}
