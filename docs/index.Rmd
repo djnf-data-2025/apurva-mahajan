@@ -212,9 +212,51 @@ datatable(series_4, options = list(pageLength = 20))
 
 ```
 
-# Population analysis
 
-#rsw comment: again, these labels need to be in English! covg4313314 etc
+# Aggregated analysis
+
+``` {r}
+
+
+# I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
+
+# Create a column that has an unweighted average of all four of these series. Also group by year instead of quarter to more easily see yearly changes.
+report_card_data_aggregated <- report_card_data %>% 
+  mutate(series_agg = (covg4313314 + covg43133142 + covg132321 + covg1323213)/4) %>% 
+  select(cntyname, quarter_index, quarter_date, series_agg) %>% 
+  mutate(year = floor(quarter_index)) %>%   
+  group_by(cntyname, year) %>%
+  summarize(mean_vax_rate = mean(series_agg, na.rm = TRUE))
+
+
+
+# Let's look at the 
+report_card_data_aggregated %>% 
+  filter(cntyname == "Keweenaw") %>% 
+  ggplot(aes(x=year)) +
+  geom_line(aes(y = mean_vax_rate)) +
+  labs(title = "Coverage Over Time in Keweenaw County",
+       y = "Coverage Value",
+       x = "Quarter",
+       color = "Coverage Type") +
+  theme_minimal()
+
+
+# Ten-year percent change for aggregated vaccine series
+report_card_data_aggregated %>% 
+  group_by(cntyname) %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+   mutate(pct_change_2014_2024 = 100 * (Y_2024 - Y_2014) / Y_2014) %>% 
+  select(cntyname, pct_change_2014_2024) %>% 
+  arrange(pct_change_2014_2024)
+
+```
+
+# Population analysis
 
 ```{r}
 
@@ -246,9 +288,10 @@ report_card_with_pop %>%
   filter(quarter_index == "2023.75") %>% 
   group_by(cntyname) %>% 
   arrange(estimate)
+
 # A reason there might be less people getting these vaccine series could potentially be because there are less children in the county? Since this is the least populated county, if children continue to grow up, there may no longer be a need to get these vaccine series. 
 
-# I'm going to re-try the population join, but instead only selecting the population under # Census data on population, election results data dating back to 2016. 
+
 
 report_card_data %>% 
   filter(cntyname == "Keweenaw") %>% 
@@ -263,6 +306,109 @@ report_card_data %>%
        color = "Coverage Type") +
   theme_minimal()
 ```
+
+``` {r}
+
+election_16 <- read.csv("../data/2016_US_County_Level_Presidential_Results.csv") %>%  clean_names()
+  
+election_20 <- read.csv("../data/2020_US_County_Level_Presidential_Results.csv") %>% clean_names
+  
+election_24 <- read.csv("../data/2024_US_County_Level_Presidential_Results.csv") %>% clean_names
+
+# Filtering for just Michigan Counties
+mi_election_16 <- election_16 %>% 
+  filter(state_abbr == "MI")
+mi_election_20 <- election_20 %>% 
+  filter(state_name == "Michigan")
+mi_election_24 <- election_24 %>% 
+  filter(state_name == "Michigan")
+
+# cleaning the names so they don't have "County" appended, since we're joining based on name
+mi_election_16$county_name <- sub(" County.*", "", mi_election_16$county_name)
+mi_election_20$county_name <- sub(" County.*", "", mi_election_20$county_name)
+mi_election_24$county_name <- sub(" County.*", "", mi_election_24$county_name)
+
+# Let's look at the average vaccine coverage by county in just election years.
+
+vaccine_election_2016 <- report_card_data_aggregated %>% 
+  group_by(cntyname) %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+  inner_join(mi_election_16, by = c("cntyname" = "county_name")) %>% 
+  select(cntyname, Y_2016, total_votes, per_dem, per_gop)  
+
+
+vaccine_election_2020 <- report_card_data_aggregated %>% 
+  group_by(cntyname) %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+  inner_join(mi_election_20, by = c("cntyname" = "county_name")) %>% 
+  select(cntyname, Y_2020, total_votes, per_dem, per_gop)
+
+vaccine_election_2024 <- report_card_data_aggregated %>% 
+  group_by(cntyname) %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+  inner_join(mi_election_24, by = c("cntyname" = "county_name")) %>% 
+  select(cntyname, Y_2024, total_votes, per_dem, per_gop, per_point_diff)
+  
+write.csv(vaccine_election_2016, "../data/test.csv")
+
+
+
+```
+
+``` {r}
+
+# Plotting elections + vaccine results using a geoJSON of Michigan counties
+
+# install.packages("gridExtra")
+library(sf)
+library(gridExtra)
+
+mi_counties <- read_sf("../data/County.geojson") %>% clean_names()
+
+# plotting to make sure it looks right
+ggplot(mi_counties) +
+  geom_sf(fill = "#69b3a2", color = "white") +
+  theme_void()
+
+# joining geoJSON to aggregate childhood vaccination data 
+
+vaccines_24 <- mi_counties %>% 
+  inner_join(vaccine_election_2024, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = Y_2024)) +
+  theme_void()
+
+
+mi_election_map_24 <- mi_counties %>% 
+  inner_join(vaccine_election_2024, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = per_point_diff)) +
+  scale_fill_gradient(
+    low = "#0041C2",
+    high = "#e51d37"
+  ) +
+  theme_void()
+
+
+grid.arrange(vaccines_24, mi_election_map_24, ncol = 2)
+```
+
+
+# Analysis by age of series
+
+## The 43... series are administered to children 19-35 months, while the 
 
 # MMR vaccine analysis
 
