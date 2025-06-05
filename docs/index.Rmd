@@ -1,93 +1,80 @@
 ---
 title: "Apurva Mahajan - Detroit"
 output: html_document
-date: "2025-04-22"
+date: "`r Sys.Date()`"
 ---
 
-
 ## Story pitch:
+I'm analyzing the percentage change in childhood vaccination rates in Michigan by county across the past decade, with a focus on measles as Michigan continues to see <a href="https://www.detroitnews.com/story/news/local/michigan/2025/06/04/measles-cases-confirmed-in-marquette-county/84028433007/"> more cases of the disease</a>.
 
-**rsw comment: let's revise to first describe the story pitch. then describe the problems. the two are conflated here and it's hard to follow the significance of what you are pursuing.**
+After pulling state-level data for the measles, mumps and rubella vaccine directly from the Michigan Department of Health and Human Services website, I found that the infant vaccination rate in Michigan dropped slightly in the past five years by about <b>six percent</b>, while the teenage MMR rate has stayed <b>relatively steady</b> in the past year, which was all the data that was available on the site. Data was not available prior to 2020 for individual antigens, such as the MMR vaccine. 
 
-After my initial analysis, I've found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state, which could potentially indicate that more rural areas are seeing larger drops in their vaccination rates for children. 
+I plan on creating a choropleth map in Datawrapper/Flourish to show the changes in vaccine rates over time for infants and teenagers, respectively. I have initial graphics using ggplot, but because my angle changed in the middle of the day Wednesday after my correlation coefficient analysis resulted in little correlation, I was unfortunately unable to complete a polished graphic that I can embed, but plan on doing so tomorrow.
 
+I performed a correlation coefficient analysis on both the percent change in election results (percentage point difference between parties) and the percentage change in the vaccination rates for each of the two series for children and teenagers, respectively, and found that there was little correlation. I also performed the same analysis on aggregated vaccine series data and election results for each election year and found that there was also no significant correlation here. Because of this, I'm moving away from the angle of looking at election results to see if counties that vote more Republican line up with a drop in vaccination rates across counties. Instead, I'm shifting my angle to just look at overall changes in vaccination based on the vaccination report card data, to determine the counties that have dropped the most in their recommended vaccination coverage for children and teenagers.
+
+I initially tried to aggregate the four vaccine series, but I do not think that is the best method to go about this analysis, as they cover different age ranges. Instead, I'm aggregating the vaccine rates based on the age range that is recommended to get them — two of the series are specifically for children aged 19 months to 35 months, and the two others are recommended for adolescents aged 13 to 17.
+
+When analyzing each of the four childhood series individually, I found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state, which could potentially indicate that more rural areas are seeing larger drops in their vaccination rates for children. 
+
+<h6> Old portion of pitch, outdated</h6>
 I've joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story. The measles vaccine, which is included in each of the four vaccine series I'm analyzing, is primarily administered to young children and adolescents. There have been 9 reported measles cases this year in Michigan so far, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties, making this the worst year in decades for measles in Michigan.
 
-## Limitations:
-
-I would like to make my methodology as sound as possible, since certain series could only be recommended for certain age ranges, so I'm planning to do some more research on this. However, there's not much online publicly, so I'm a little stuck until I talk to an expert, such as a Michigan epidemiologist, who can provide me more context on this data, since these vaccine series are only used by the state's department of health and human services.
-
-------------------------------------------------------------------------
-
-
-**rsw comment: integrate the underlined material below into your narrative and code**
-
+---------------------
 
 # Load software libraries
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 #install.packages("tidyverse")
 #install.packages("janitor")
 #install.packages("readxl")
-#install.packages("rvest")
 #install.packages("tidycensus")
 #install.packages("DT")
-
 library(tidyverse)
 library(janitor)
 library(readxl)
-library(rvest)
 library(tidycensus)
 library(DT)
-
+library(sf)
+library(gridExtra)
+library(zoo)
 
 ```
 
 # Load data + initial cleaning
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 
-# The report card data provides estimates for immunization coverage at the county level for vaccines recommended for children (19-35 months) and adolescent (13-17-year-olds)
-
-# load in vaccine report card data
+# The report card data provides estimates for immunization coverage at the county level for vaccines recommended for children (19-35 months) and adolescent (13-17-year-olds).
+# Load vaccine report card data.
 report_card_data <- read.csv("../data/Report_card_All_data_20250313.csv") |> 
     clean_names()
+
+# Load geoJSON for mapping.
+mi_counties <- read_sf("../data/County.geojson") %>% clean_names()
+
 
 # How many counties?
 report_card_data$cntyname %>% 
   unique()
 # Michigan has 83 counties. There are 85 unique county values, because this data set includes Detroit City and the State of Michigan's vaccination report cards.
-
 # I'm creating a column based on an index so I can plot this and analyze by time. 
-
-#rsw comment: do you really need to have 76 columns at this point? can you narrow it down?
-
 report_card_data <- report_card_data %>% 
   mutate(
      quarter_num = as.numeric(sub("Q", "", quarter)),
      quarter_index = year + (quarter_num - 1) / 4,
     quarter_date = make_date(year, (quarter_num - 1) * 3 + 1, 1)
   )
-
 ```
-
 # Percent change analysis for four childhood vaccination series over the past decade
-
-#rsw comment: break out each one of these, provide an english translation for each of the vaccine series 4313314 = "a polio vaccine" and display them using a datatable
-
-datatable(DF, caption = "XXXX", options = list(pageLength = 20))
 
 ```{r}
 ### PERCENT CHANGE IN VACCINATION COVERAGE
 
-##rsw comment: define 4313314, 43133142, 132321, 1323213. editors will have no idea what you're talking about
-
-# For this analysis, I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
-
+# For this analysis, I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents — the first two are for babies from 19-35 months, and the latter two are for teens.
 ``` 
 
 ## 4313314 series: 
-
 - 4 or more doses of DTaP/DTP/DT
 - 3 or more doses of Polio
 - 1 or more dose of MMR
@@ -98,10 +85,7 @@ datatable(DF, caption = "XXXX", options = list(pageLength = 20))
 
 ```{r}
 # Let's look at the 4313314 series: "4 or more doses of DTaP/DTP/DT, 3 or more doses of Polio, 1 or more dose of MMR, 3 or more doses of Hib, 3 ore more doses of HepB, 1 or more dose of Varicella, 4 or more doses of PCV." 
-
 # Coverage for the 4313314 vaccine decreased for all but three counties in Michigan. Oscoda and Keweenaw Counties nearly halved their vaccine coverage for this series. 
-
-#rsw comment - so how many people are not vaccinated for polio now by county?
 
 series_1 <- report_card_data %>% 
   group_by(cntyname) %>% 
@@ -115,13 +99,10 @@ series_1 <- report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
-datatable(series_1, options = list(pageLength = 20))
-
-
+datatable(series_1, options = list(pageLength = 10))
 ```
 
 ## 43133142 series:
-
 - 4 or more doses of DTaP/DTP/DT
 - 3 or more doses of Polio
 - 1 or more dose of MMR
@@ -146,13 +127,10 @@ series_2 <- report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
-datatable(series_2, options = list(pageLength = 20))
-
-
+datatable(series_2, options = list(pageLength = 10))
 ```
 
 ## 132321 series:
-
 - 1 or more doses of Tdap
 - 3 or more doses of Polio
 - 2 or more doses of MMR 
@@ -161,9 +139,7 @@ datatable(series_2, options = list(pageLength = 20))
 - 1 or more dose of MenACWY
 
 ```{r}
-
-#### 132321 SERIES ####
-##This series did not have as high percent change decreases, but Keewenaw is in the top five here too. 
+# This series did not have as high percent change decreases, but Keewenaw is in the top five here too.
 series_3 <- report_card_data %>% 
   group_by(cntyname) %>% 
   filter(quarter_index %in% c(2014.75, 2024.75)) %>% 
@@ -176,13 +152,10 @@ series_3 <- report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
-datatable(series_3, options = list(pageLength = 20))
-
-
+datatable(series_3, options = list(pageLength = 10))
 ```
 
 ## 1323213 series:
-
 - 1 or more doses of Tdap
 - 3 or more doses of Polio
 - 2 or more doses of MMR
@@ -190,10 +163,7 @@ datatable(series_3, options = list(pageLength = 20))
 - 2 or more doses of Varicella
 - 1 or more dose of MenACWY
 - HPV complete (with 2 or 3 doses (Males & Females))
-
-
 ``` {r}
-#### 1323213 SERIES ####
 # Nearly all counties have increased their coverage of this series. I'm wondering the reason behind this, and if it is significant. Could this change be because this is a new vaccine series that only started being implemented recently? Would love to talk to a Michigan epidemiologist who works for the state DHHS or some other expert to understand this. 
 series_4 <- report_card_data %>% 
   group_by(cntyname) %>% 
@@ -207,17 +177,135 @@ series_4 <- report_card_data %>%
   mutate(pct_change_2014_2024 = 100 * (Q_2024.75 - Q_2014.75) / Q_2014.75) %>% 
   arrange(pct_change_2014_2024)
 
-datatable(series_4, options = list(pageLength = 20))
+datatable(series_4, options = list(pageLength = 10))
+```
+# Analysis by age of series
 
+### The 431XXXX series are administered to children 19-35 months, while the 132XXXX series are for adolescents aged 13-17 years. Let's do an unweighted mean of vaccination rates by the age range of the vaccine series instead of aggregating all four.
+
+``` {r message=FALSE, warning=FALSE}
+# Aggregating vaccine rates for just the infant series.
+baby_vax <- report_card_data %>% 
+  mutate(vax_agg = ((covg4313314 + covg43133142)/2)) %>% 
+  select(cntyname, year, vax_agg) %>% 
+  group_by(cntyname, year) %>% 
+  summarize(mean_vax_rate = mean(vax_agg, na.rm = TRUE)) 
+
+# Infant vaccine series rate over past decade.
+baby_vax_change <- baby_vax %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+  mutate(
+    pct_change_14_24 = ((Y_2024 - Y_2014)/Y_2014) * 100
+  ) %>% 
+  select(cntyname, pct_change_14_24) %>% 
+  arrange(pct_change_14_24)
+
+# Mapping percentage change of vaccination rates for infants.
+mi_counties %>% 
+  inner_join(baby_vax_change, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = pct_change_14_24)) +
+  scale_fill_gradient(
+    high = "#FFFFC5",
+    low = "#e51d37") +
+  labs(title = "Rates of recommended vaccines for children aged 19 to 35 months
+decreased by 46% in Keweenaw County during the past decade,
+the highest in Michigan") +
+  theme_void()
+
+# Aggregating vaccine rates for just the adolescent series.
+teen_vax <- report_card_data %>% 
+  mutate(vax_agg = ((covg132321 + covg1323213)/2)) %>% 
+  select(cntyname, year, vax_agg) %>% 
+  group_by(cntyname, year) %>% 
+  summarize(mean_vax_rate = mean(vax_agg, na.rm = TRUE)) 
+
+# Adolescent vaccine rate over past decade.
+# The vaccine rate for the teen series has increased in nearly every county in the past ten years, primarily because of the 1323213 series, which saw an increase in nearly every county as well. I wonder if this could be because it's a newer series that only recently began to be implemented, but I need to talk to an expert about this.
+teen_vax_change <- teen_vax %>% 
+  pivot_wider(
+    names_from = year,
+    values_from = mean_vax_rate,
+    names_prefix = "Y_"
+  ) %>% 
+  mutate(
+    pct_change_14_24 = ((Y_2024 - Y_2014)/Y_2014) * 100
+  ) %>% 
+  select(cntyname, pct_change_14_24) %>% 
+  arrange(pct_change_14_24)
+
+# Mapping percentage change of teenage vaccination series from 2014 to 2024.
+mi_counties %>% 
+  inner_join(teen_vax_change, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = pct_change_14_24)) +
+  theme_void()
+
+  
 
 ```
 
+# MMR vaccine data: 19-35 months.
+<h5>The MMR vaccine's coverage rate in young children has decreased by 6.8% since January 2020. </h5> 
+
+``` {r}
+
+infant_vax_2020_25 <- read_excel("../data/mcir-vax-data/Profile-by-County-19-35-Months-2020-Present.xlsx", sheet = 2) %>% clean_names
+
+# Filtering the statewide MMR vaccine rates for Michigan.
+infant_mmr_2020_25 <- infant_vax_2020_25 %>% 
+  filter(antigen == "1+ MMR") %>% 
+  pivot_longer(
+    cols = jan2020:apr2025,
+    names_to = "month",
+    values_to = "vax_rate"
+  ) %>% 
+  mutate(month_year = as.yearmon(month, format = "%b%Y")) %>% 
+  select(-month) 
+
+# Plotting change over time.
+infant_mmr_2020_25 %>% 
+  ggplot() +
+  geom_line(aes(x=month_year, y = vax_rate)) +
+  expand_limits(y=0)
+
+# Percent change from January 2020 to April 2025.
+100 * ((79.5-85.3)/85.3)
+
+```
+
+# MMR vaccine data: 13-17 years. (Data is only available for May 2024 to April 2025) 
+
+<h4> MMR vaccine rates for teenagers has stayed relatively the same in the past year, increasing by 0.23% in that time.</h4>
+
+```{r}
+
+# Filtering just statewide MMR vaccine data for adolescents.
+teen_mmr_2020_25 <- read_excel("../data/mcir-vax-data/Profile-by-County-13-17-Years-2020-Present.xlsx", sheet = 2) %>% clean_names %>% 
+  filter(antigen == "2+ MMR") %>% 
+  pivot_longer(
+    cols = may2024:apr2025,
+    names_to = "month",
+    values_to = "vax_rate"
+  ) %>% 
+  mutate(month_year = as.yearmon(month, format = "%b%Y")) %>% 
+  select(-month) 
+
+teen_mmr_2020_25 %>% 
+  ggplot() +
+  geom_line(aes(x=month_year, y = vax_rate)) +
+  expand_limits(y=0)
+
+100 * ((86.5-86.3)/86.3)
+```
 
 # Aggregated analysis
 
 ``` {r}
-
-
 # I'm focusing on the vaccine series 4313314, 43133142, 132321, 1323213, and the MMR vaccine. These are the series Michigan recommends for children and adolescents. 
 
 # Create a column that has an unweighted average of all four of these series. Also group by year instead of quarter to more easily see yearly changes.
@@ -228,22 +316,18 @@ report_card_data_aggregated <- report_card_data %>%
   group_by(cntyname, year) %>%
   summarize(mean_vax_rate = mean(series_agg, na.rm = TRUE))
 
+# report_card_data_aggregated %>% 
+  # filter(cntyname == "Keweenaw") %>% 
+  # ggplot(aes(x=year)) +
+  # geom_line(aes(y = mean_vax_rate)) +
+  # labs(title = "Coverage Over Time in Keweenaw County",
+      # y = "Coverage Value",
+      # x = "Quarter",
+      # color = "Coverage Type") +
+  # theme_minimal()
 
-
-# Let's look at the 
-report_card_data_aggregated %>% 
-  filter(cntyname == "Keweenaw") %>% 
-  ggplot(aes(x=year)) +
-  geom_line(aes(y = mean_vax_rate)) +
-  labs(title = "Coverage Over Time in Keweenaw County",
-       y = "Coverage Value",
-       x = "Quarter",
-       color = "Coverage Type") +
-  theme_minimal()
-
-
-# Ten-year percent change for aggregated vaccine series
-report_card_data_aggregated %>% 
+# Ten-year percent change for aggregated vaccine series.
+pct_change_agg <- report_card_data_aggregated %>% 
   group_by(cntyname) %>% 
   pivot_wider(
     names_from = year,
@@ -253,28 +337,23 @@ report_card_data_aggregated %>%
    mutate(pct_change_2014_2024 = 100 * (Y_2024 - Y_2014) / Y_2014) %>% 
   select(cntyname, pct_change_2014_2024) %>% 
   arrange(pct_change_2014_2024)
-
 ```
 
 # Population analysis
 
-```{r}
-
+```{r message=FALSE, warning=FALSE}
 # Let's look at populations for these counties.
-
-###### DELETE API KEY BEFORE PUSHING!!!!! ######
-
-# Load 2023 ACS population data from tidycensus
+# Load 2023 ACS population data from tidycensus.
 vars <- load_variables(2023, "acs1") 
 
-# 2023 Census population by county
+# 2023 Census population by county.
 pop_by_county <- get_acs(
   geography = "county",
   variables = "B01001A_001",
   state = "MI",
 ) %>% clean_names()
 
-# Cleaning census data set's names to get rid of extra text like "County"
+# Cleaning census data set's names to get rid of extra text like "County."
 pop_by_county$name <- sub(" County.*", "", pop_by_county$name)
 
 report_card_with_pop <- report_card_data %>% 
@@ -289,33 +368,28 @@ report_card_with_pop %>%
   group_by(cntyname) %>% 
   arrange(estimate)
 
-# A reason there might be less people getting these vaccine series could potentially be because there are less children in the county? Since this is the least populated county, if children continue to grow up, there may no longer be a need to get these vaccine series. 
-
-
-
-report_card_data %>% 
-  filter(cntyname == "Keweenaw") %>% 
-  ggplot(aes(x=quarter_index)) +
-  geom_line(aes(y = covg4313314, color = "covg4313314")) +
-  geom_line(aes(y = covg43133142, color = "covg43133142")) +
-  geom_line(aes(y = covg132321, color = "covg132321")) +
-  geom_line(aes(y = covg1323213, color = "covg1323213")) +
-  labs(title = "Coverage Over Time in Keweenaw County",
-       y = "Coverage Value",
-       x = "Quarter",
-       color = "Coverage Type") +
-  theme_minimal()
+# report_card_data %>% 
+#   filter(cntyname == "Keweenaw") %>% 
+#   ggplot(aes(x=quarter_index)) +
+#   geom_line(aes(y = covg4313314, color = "covg4313314")) +
+#   geom_line(aes(y = covg43133142, color = "covg43133142")) +
+#   geom_line(aes(y = covg132321, color = "covg132321")) +
+#   geom_line(aes(y = covg1323213, color = "covg1323213")) +
+#   labs(title = "Coverage Over Time in Keweenaw County",
+#        y = "Coverage Value",
+#        x = "Quarter",
+#        color = "Coverage Type") +
+#   theme_minimal()
 ```
 
+# Aggregate election analysis
+
 ``` {r}
-
 election_16 <- read.csv("../data/2016_US_County_Level_Presidential_Results.csv") %>%  clean_names()
-  
-election_20 <- read.csv("../data/2020_US_County_Level_Presidential_Results.csv") %>% clean_names
-  
-election_24 <- read.csv("../data/2024_US_County_Level_Presidential_Results.csv") %>% clean_names
+election_20 <- read.csv("../data/2020_US_County_Level_Presidential_Results.csv") %>% clean_names()
+election_24 <- read.csv("../data/2024_US_County_Level_Presidential_Results.csv") %>% clean_names()
 
-# Filtering for just Michigan Counties
+# Filtering for just Michigan counties
 mi_election_16 <- election_16 %>% 
   filter(state_abbr == "MI")
 mi_election_20 <- election_20 %>% 
@@ -329,8 +403,8 @@ mi_election_20$county_name <- sub(" County.*", "", mi_election_20$county_name)
 mi_election_24$county_name <- sub(" County.*", "", mi_election_24$county_name)
 
 # Let's look at the average vaccine coverage by county in just election years.
-
 vaccine_election_2016 <- report_card_data_aggregated %>% 
+  filter(year == 2016) %>% 
   group_by(cntyname) %>% 
   pivot_wider(
     names_from = year,
@@ -338,10 +412,13 @@ vaccine_election_2016 <- report_card_data_aggregated %>%
     names_prefix = "Y_"
   ) %>% 
   inner_join(mi_election_16, by = c("cntyname" = "county_name")) %>% 
-  select(cntyname, Y_2016, total_votes, per_dem, per_gop)  
-
-
+  select(cntyname, Y_2016, total_votes, per_dem, per_gop) %>% 
+  mutate(
+    per_point_diff = (per_gop - per_dem)
+  )
+  
 vaccine_election_2020 <- report_card_data_aggregated %>% 
+  filter(year == 2020) %>% 
   group_by(cntyname) %>% 
   pivot_wider(
     names_from = year,
@@ -349,9 +426,10 @@ vaccine_election_2020 <- report_card_data_aggregated %>%
     names_prefix = "Y_"
   ) %>% 
   inner_join(mi_election_20, by = c("cntyname" = "county_name")) %>% 
-  select(cntyname, Y_2020, total_votes, per_dem, per_gop)
+  select(cntyname, Y_2020, total_votes, per_dem, per_gop, per_point_diff)
 
 vaccine_election_2024 <- report_card_data_aggregated %>% 
+  filter(year == 2024) %>% 
   group_by(cntyname) %>% 
   pivot_wider(
     names_from = year,
@@ -360,36 +438,20 @@ vaccine_election_2024 <- report_card_data_aggregated %>%
   ) %>% 
   inner_join(mi_election_24, by = c("cntyname" = "county_name")) %>% 
   select(cntyname, Y_2024, total_votes, per_dem, per_gop, per_point_diff)
-  
-write.csv(vaccine_election_2016, "../data/test.csv")
-
-
-
 ```
 
+# Mapping election and vaccine results for 2024
+
 ``` {r}
-
 # Plotting elections + vaccine results using a geoJSON of Michigan counties
-
 # install.packages("gridExtra")
-library(sf)
-library(gridExtra)
-
-mi_counties <- read_sf("../data/County.geojson") %>% clean_names()
-
-# plotting to make sure it looks right
-ggplot(mi_counties) +
-  geom_sf(fill = "#69b3a2", color = "white") +
-  theme_void()
 
 # joining geoJSON to aggregate childhood vaccination data 
-
 vaccines_24 <- mi_counties %>% 
   inner_join(vaccine_election_2024, by = c("name" = "cntyname")) %>% 
   ggplot() +
   geom_sf(aes(fill = Y_2024)) +
   theme_void()
-
 
 mi_election_map_24 <- mi_counties %>% 
   inner_join(vaccine_election_2024, by = c("name" = "cntyname")) %>% 
@@ -401,21 +463,108 @@ mi_election_map_24 <- mi_counties %>%
   ) +
   theme_void()
 
-
 grid.arrange(vaccines_24, mi_election_map_24, ncol = 2)
 ```
 
+# Election and vaccine rates in 2020
 
-# Analysis by age of series
+``` {r}
+vaccines_20 <- mi_counties %>% 
+  inner_join(vaccine_election_2020, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = Y_2020)) +
+  theme_void()
 
-## The 43... series are administered to children 19-35 months, while the 
+mi_election_map_20 <- mi_counties %>% 
+  inner_join(vaccine_election_2020, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = per_point_diff)) +
+  scale_fill_gradient(
+    low = "#0041C2",
+    high = "#e51d37"
+  ) +
+  theme_void()
 
-# MMR vaccine analysis
+grid.arrange(vaccines_20, mi_election_map_20, ncol = 2)
+```
+
+# Election and vaccine rates in 2016
 
 ```{r}
 
-# Let's look at MMR vaccination rates as of Dec. 31, 2024 (end of 2024 Q4)
+vaccines_16 <- mi_counties %>% 
+  inner_join(vaccine_election_2016, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = Y_2016)) +
+  theme_void()
 
+mi_election_map_16 <- mi_counties %>% 
+  inner_join(vaccine_election_2016, by = c("name" = "cntyname")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = per_point_diff)) +
+  scale_fill_gradient(
+    low = "#0041C2",
+    high = "#e51d37"
+  ) +
+  theme_void()
+
+grid.arrange(vaccines_16, mi_election_map_16, ncol = 2)
+
+```
+
+# Correlation coefficients 
+
+``` {r}
+# Correlation coefficients between the vaccine rates and the percentage point difference in that year's election. (GOP% - DEM%)
+cor(vaccine_election_2020$Y_2020, vaccine_election_2020$per_point_diff)
+cor(vaccine_election_2024$Y_2024, vaccine_election_2024$per_point_diff)
+cor(vaccine_election_2016$Y_2016, vaccine_election_2016$per_point_diff)
+# No significant results year by year.
+
+# Percent change from 2020 to 2024 for both election result difference (pct points) and vaccine rates.
+election_pct_change <- vaccine_election_2016 %>% 
+  inner_join(vaccine_election_2024, by=c("cntyname" = "cntyname")) %>%
+  mutate(pct_change_election_points = 100 * (per_point_diff.y - per_point_diff.x)/per_point_diff.x) %>% 
+  select(cntyname, Y_2016, Y_2024, pct_change_election_points)
+
+# Percent change over 10 years for aggregated vaccines (NOT USING!) and for election difference.
+pct_change_vax_and_election <- pct_change_agg %>% inner_join(
+  election_pct_change, by=c("cntyname" = "cntyname")
+) %>% 
+  select(
+    cntyname, pct_change_election_points, pct_change_2014_2024
+  )
+  
+# Correlation between percent change in agg vaccine rates and percent change in election difference.
+cor(pct_change_vax_and_election$pct_change_2014_2024, pct_change_vax_and_election$pct_change_election_points)
+# There is no significant correlation between the percentage change in aggregated vaccination rates and the percentage change in the percentage point difference between the 2016 election and the 2024 election. I can't confidently compare the vaccination rates in a given county to how blue or red it voted in a given election. 
+
+# Correlation between percent change in infant vaccine rates and percent change in election difference.
+
+# Join both percent change datasets together.
+cc_baby_election <- baby_vax_change %>% inner_join(
+  election_pct_change, by=c("cntyname" = "cntyname")
+) %>% 
+  select(cntyname, pct_change_14_24, pct_change_election_points)
+
+# Coefficient is -0.07. Little correlation.
+cor(cc_baby_election$pct_change_14_24, cc_baby_election$pct_change_election_points)
+
+# Same thing for teen vaccine series. Join both percentage change datasets together.
+cc_teen_election <- teen_vax_change %>% inner_join(
+  election_pct_change, by=c("cntyname" = "cntyname")
+) %>% 
+  select(cntyname, pct_change_14_24, pct_change_election_points)
+
+# Coefficient is -0.012. Little correlation.
+cor(cc_teen_election$pct_change_14_24, cc_teen_election$pct_change_election_points)
+
+```
+
+# MMR vaccine analysis from report card data (only 2024)
+
+```{r}
+# Let's look at MMR vaccination rates as of Dec. 31, 2024 (end of 2024 Q4)
 report_card_data %>% 
   filter(
     year == "2024",
@@ -443,10 +592,20 @@ report_card_data %>%
   arrange(covgmmr) %>% 
   slice(1:10)
 
-# Oscoda County had the lowest MMR vaccination rates, followed by Keweenaw, Gladwin, Mackinac and Salinac. None of these counties saw measles cases in 2025.
 
+# Aggregating MMR vaccines by county 
+
+
+# Oscoda County had the lowest MMR vaccination rates, followed by Keweenaw, Gladwin, Mackinac and Salinac. None of these counties saw measles cases in 2025.
+```
+
+# Immunization status of children by school: 19-35 months.
+
+```{r}
 
 ```
+
+
 
 # Questions
 
@@ -454,8 +613,9 @@ Write down questions you want answered:
 
 # Potential sources:
 
-Thrishika Bala, epidemiologist for the state of Michigan
-Lynn Sutfin, PIO for Michigan DHHS, SutfinL1\@michigan.gov
+<p>Thrishika Bala, epidemiologist for the state of Michigan<p>
+<p>Lynn Sutfin, PIO for Michigan DHHS, SutfinL1\@michigan.gov</p>
+<p>Ryan Malosh at MaloshR\@michigan.gov</p>
 
 # Data Details
 [This website explains the different Series numbers for the sets of vaccines: <https://www.michigan.gov/mdhhs/adult-child-serv/childrenfamilies/immunizations/data-statistics/countyimmsreportcards>]{.underline}
