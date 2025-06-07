@@ -61,6 +61,10 @@ I performed a correlation coefficient analysis on both the percent change in ele
 
 I initially tried to aggregate the four vaccine series, but I do not think that is the best method to go about this analysis, as they cover different age ranges. Instead, I'm aggregating the vaccine rates based on the age range that is recommended to get them --- two of the series are specifically for children aged 19 months to 35 months, and the two others are recommended for adolescents aged 13 to 17.
 
+<div class="flourish-embed flourish-chart" data-src="visualisation/23640351"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/23640351/thumbnail" width="100%" alt="chart visualization" /></noscript></div>
+
+<div class="flourish-embed flourish-chart" data-src="visualisation/23640919"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/23640919/thumbnail" width="100%" alt="chart visualization" /></noscript></div>
+
 When analyzing each of the four childhood series individually, I found that two counties in Michigan --- Oscoda and Keweenaw --- have seen the highest drops in immunization rates for three of the four major vaccine series, and consistently fell in the bottom three for lowest MMR vaccination rates in the state. These two counties also have some of the lowest populations in the state, which could potentially indicate that more rural areas are seeing larger drops in their vaccination rates for children.
 
 I originally joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story. The measles vaccine, which is included in each of the four vaccine series I'm analyzing, is primarily administered to young children and adolescents. There have been 9 reported measles cases this year in Michigan so far, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties, making this the worst year in decades for measles in Michigan.
@@ -402,6 +406,8 @@ teen_vax <- report_card_data %>%
   group_by(cntyname, year) %>% 
   summarize(mean_vax_rate = mean(vax_agg, na.rm = TRUE)) 
 
+write_csv(teen_vax, "../data/teen-vax-rate.csv")
+
 # Adolescent vaccine rate over past decade.
 # The vaccine rate for the teen series has increased in nearly every county in the past ten years, primarily because of the 1323213 series, which saw an increase in nearly every county as well. I wonder if this could be because it's a newer series that only recently began to be implemented, but I need to talk to an expert about this.
 teen_vax_change <- teen_vax %>% 
@@ -667,8 +673,8 @@ vaccines_20 <- mi_counties %>%
   geom_sf(aes(fill = Y_2020)) +
   theme_void()
 
-mi_election_map_20 <- mi_counties %>% 
-  inner_join(vaccine_election_2020, by = c("name" = "cntyname")) %>% 
+mi_election_map_20 <- mi_counties %>%
+  inner_join(vaccine_election_2020, by = c("name" = "cntyname")) %>%
   ggplot() +
   geom_sf(aes(fill = per_point_diff)) +
   scale_fill_gradient(
@@ -677,7 +683,7 @@ mi_election_map_20 <- mi_counties %>%
   ) +
   theme_void()
 
-grid.arrange(vaccines_20, mi_election_map_20, ncol = 2)
+# grid.arrange(vaccines_20, mi_election_map_20, ncol = 2)
 ```
 
 # Election and vaccine rates in 2016
@@ -690,8 +696,8 @@ vaccines_16 <- mi_counties %>%
   geom_sf(aes(fill = Y_2016)) +
   theme_void()
 
-mi_election_map_16 <- mi_counties %>% 
-  inner_join(vaccine_election_2016, by = c("name" = "cntyname")) %>% 
+mi_election_map_16 <- mi_counties %>%
+  inner_join(vaccine_election_2016, by = c("name" = "cntyname")) %>%
   ggplot() +
   geom_sf(aes(fill = per_point_diff)) +
   scale_fill_gradient(
@@ -700,7 +706,7 @@ mi_election_map_16 <- mi_counties %>%
   ) +
   theme_void()
 
-grid.arrange(vaccines_16, mi_election_map_16, ncol = 2)
+#grid.arrange(vaccines_16, mi_election_map_16, ncol = 2)
 
 ```
 
