@@ -65,6 +65,9 @@ When analyzing each of the four childhood series individually, I found that two 
 
 I originally joined the vaccination report card data to Census ACS data from 2023 on population for each county, and am working on joining election data to this to see if there's a pattern between vaccination rates and how people voted in the 2024 and 2016 elections. I'd like to see the proportion of votes allocated toward the Republican Party and the Democratic Party for each of the counties in Michigan, and I want to perform a more robust analysis for these counties beyond what I found of the two counties that immediately stand out. I also plan on looking at the vaccination rates for the MMR vaccine alone. I've found the csv for this from the Michigan government and will load it in as I continue work on this story. The measles vaccine, which is included in each of the four vaccine series I'm analyzing, is primarily administered to young children and adolescents. There have been 9 reported measles cases this year in Michigan so far, in Ingham, Kent, Macomb, Marquette, Montcalm and Oakland Counties, making this the worst year in decades for measles in Michigan.
 
+<h3>What does this mean?</h3>
+Though there was no correlation between vaccination rates and individual cases of measles, it's interesting to see where in the state children are the most vaccinated. Since there were low correlation coefficients for variables like income and election results, I'd like to ask an epidemiologist who works for the state government the reasoning behind some of these changes and drops in vaccination coverage, as well as more background information about each of the vaccination series in case it is not recommended to aggregate them for data analysis. 
+
 ------------------------------------------------------------------------
 
 <h3> Load software libraries </h3>
@@ -145,11 +148,9 @@ write_csv(waiver_rate_k, "../data/waiver-rate_k.csv")
 
 datatable(waiver_rate_k, options = list(pageLength = 10))
 
-
 #install.packages("showtext")
 font_add_google("Roboto Condensed", "roboto")
 showtext_auto()
-
 
 mi_counties %>% 
   inner_join(waiver_rate_k, by = c("name" = "county")) %>% 
@@ -231,7 +232,6 @@ waivers in 2023."
 
 
 ```
-
 
 # Percent change analysis for four childhood vaccination series over the past decade
 
@@ -364,6 +364,8 @@ baby_vax <- report_card_data %>%
   group_by(cntyname, year) %>% 
   summarize(mean_vax_rate = mean(vax_agg, na.rm = TRUE)) 
 
+write_csv(baby_vax, "../data/baby-vax-rate.csv")
+
 # Infant vaccine series rate over past decade.
 baby_vax_change <- baby_vax %>% 
   pivot_wider(
@@ -422,9 +424,6 @@ write_csv(teen_vax_change, "../data/teen-vax-pct-change.csv")
 #   ggplot() +
 #   geom_sf(aes(fill = pct_change_14_24)) +
 #   theme_void()
-
-  
-
 ```
 
 # Analyze percentage of waiver types: philosophy (personal reasons), medical, religion.
@@ -440,7 +439,6 @@ chat <- chat_groq(
 )
 
 # waiver_data <- chat$chat("turn the data from this image into a structured csv format", table_image)
-
 ```
 
 # MMR vaccine data: 19-35 months.
